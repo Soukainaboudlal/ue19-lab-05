@@ -22,7 +22,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: ghcr.io/soukainaboudlal/ue19-lab-05:latest
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ghcr.io/soukainaboudlal/ue19-lab-05:latest
+          format: table
+          exit-code: 0
+          ignore-unfixed: true
+
+      - name: Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
