@@ -20,9 +20,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false        # on NE push PAS tant que Trivy n’a pas scanné
+          tags: ghcr.io/${{ github.repository_owner }}/ue19-lab-05:latest
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/ue19-lab-05:latest
+          format: table
+          exit-code: 0
+          ignore-unfixed: true
+
+      - name: Push image after scan
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner | lower }}/ue19-lab-05:latest
+          tags: ghcr.io/${{ github.repository_owner }}/ue19-lab-05:latest
