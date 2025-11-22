@@ -20,13 +20,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+      # 1) On construit l'image, sans la pousser, mais on la charge localement
+      - name: Build image (no push yet)
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: false        # on NE push PAS tant que Trivy n’a pas scanné
+          load: true          # <-- important pour que Trivy puisse la scanner
+          push: false
           tags: ghcr.io/${{ github.repository_owner }}/ue19-lab-05:latest
 
+      # 2) On scanne l'image avec Trivy
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
@@ -35,7 +38,8 @@ jobs:
           exit-code: 0
           ignore-unfixed: true
 
-      - name: Push image after scan
+      # 3) Si le scan est OK, on pousse l'image
+      - name: Push image
         uses: docker/build-push-action@v4
         with:
           context: .
