@@ -27,4 +27,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ toLower(github.repository) }}:latest
+          tags: ghcr.io/soukainaboudlal/ue19-lab-05:latest
+
